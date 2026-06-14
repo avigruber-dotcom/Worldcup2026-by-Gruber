@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🏆 World Cup 2026 Predictor</title>
+  
+  <style>
+    :root {
+      --bg:#1d4ed8;
+      --bg2:#2563eb;
+      --card:#16345f;
+      --card2:#1e3a6d;
+      --ink:#f8fafc;
+      --muted:#9ca3af;
+      --line:rgba(255,255,255,.10);
+      --blue:#38bdf8;
+      --gold:#fbbf24;
+      --green:#22c55e;
+      --red:#fb7185;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family: Arial, "Noto Sans Hebrew", sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.12), transparent 30%),
+        linear-gradient(180deg,var(--bg) 0%, var(--bg2) 100%);
+      color:var(--ink);
+      min-height:100vh;
+    }
+    .wrap, .container { max-width: 1600px; margin:0 auto; padding:28px; }
+    .hero, .card {
+      background:linear-gradient(180deg, rgba(22,52,95,.96), rgba(30,58,109,.96));
+      border:2px solid rgba(255,255,255,.18);
+      border-radius:28px;
+      box-shadow:0 12px 30px rgba(0,0,0,.22);
+      padding:22px;
+      margin-bottom:20px;
+      backdrop-filter: blur(8px);
+    }
+    .hero {
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(56,189,248,.24);
+    }
+    .hero:before {
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(120deg, rgba(56,189,248,.16), transparent 45%, rgba(251,191,36,.10));
+      pointer-events:none;
+    }
+    .hero > * { position:relative; z-index:1; }
+    h1 {
+      margin:.25rem 0 .5rem;
+      font-size:42px;
+      line-height:1.05;
+      color:white;
+      letter-spacing:.2px;
+    }
+    h2 { margin:0 0 14px; font-size:22px; color:white; }
+    h3 { margin:0 0 10px; color:white; }
+    p, .muted { color:var(--muted); line-height:1.6; margin:.35rem 0; }
+    .buttons { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+    button {
+      border:1px solid rgba(255,255,255,.12);
+      background:linear-gradient(135deg,#0ea5e9,#2563eb);
+      color:white;
+      padding:10px 14px;
+      border-radius:15px;
+      cursor:pointer;
+      font-weight:800;
+      box-shadow:0 6px 18px rgba(37,99,235,.28);
+    }
+    button:hover { filter:brightness(1.08); transform:translateY(-1px); }
+    button.primary { background:linear-gradient(135deg,#fbbf24,#f97316); color:#111827; border-color:rgba(251,191,36,.45); }
+    button.active { background:linear-gradient(135deg,#22c55e,#16a34a); color:#052e16; }
+    input {
+      width:100%;
+      border:2px solid rgba(255,255,255,.28);
+      border-radius:13px;
+      padding:8px;
+      font-size:14px;
+      background:#0b1e3a;
+      color:white;
+      text-align:center;
+      font-weight:800;
+      outline:none;
+    }
+    input:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(56,189,248,.16); }
+    input.score { text-align:center; font-weight:900; }
+    .note {
+      background:rgba(251,191,36,.12);
+      border:1px solid rgba(251,191,36,.28);
+      border-radius:18px;
+      padding:13px 15px;
+      color:#fde68a;
+      line-height:1.6;
+      margin-top:14px;
+    }
+    .grid { display:grid; gap:20px; }
+    .two { grid-template-columns: 1.15fr .85fr; }
+    .groups-grid { grid-template-columns: repeat(4, minmax(0,1fr)); }
+    .tables-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .ko-grid { grid-template-columns: repeat(6, minmax(230px,1fr)); overflow-x:auto; padding-bottom:8px; }
+    .groupbox {
+      border:2px solid rgba(255,255,255,.18);
+      border-radius:20px;
+      padding:14px;
+      background:rgba(8,15,40,.18);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .team-edit { margin-bottom:8px; }
+    .match {
+      display:grid;
+      grid-template-columns: 50px 1fr 54px 54px 1fr;
+      gap:10px;
+      align-items:center;
+      background:rgba(8,15,40,.22);
+      border:1px solid rgba(8,15,40,.32);
+      border-radius:18px;
+      padding:12px;
+      margin-bottom:10px;
+      font-size:14px;
+      transition:.15s ease;
+    }
+    .match:hover { background:rgba(8,15,40,.32); transform:translateY(-1px); }
+    .match .a { text-align:left; font-weight:800; color:white; }
+    .match .b { font-weight:800; color:white; }
+    .g {
+      color:#06111f;
+      font-weight:900;
+      text-align:center;
+      background:linear-gradient(135deg,var(--gold),#f97316);
+      border-radius:999px;
+      padding:7px 0;
+    }
+    .meta { color:#cbd5e1; font-size:12px; line-height:1.4; margin-top:6px; }
+    .betline {
+      grid-column:2 / 6;
+      display:grid;
+      grid-template-columns: 70px 54px 54px 1fr;
+      gap:8px;
+      align-items:center;
+      margin-top:6px;
+      color:#cbd5e1;
+      font-size:12px;
+    }
+    .betline input { background:#09243a; border-color:rgba(56,189,248,.32); }
+    .labeltiny { color:#7dd3fc; font-size:11px; font-weight:900; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { color:#93c5fd; text-align:center; font-weight:900; }
+    td { padding:6px 2px; text-align:center; border-top:1px solid rgba(255,255,255,.07); color:#e5e7eb; }
+    td:first-child, th:first-child { text-align:right; }
+    .qual { font-weight:900; color:white; }
+    .third { color:#7dd3fc; font-weight:900; }
+    .out { color:#94a3b8; }
+    .thirdrow {
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      background:rgba(8,15,40,.22);
+      border:2px solid rgba(125,211,252,.22);
+      padding:11px;
+      border-radius:15px;
+      margin-bottom:8px;
+      font-size:14px;
+      color:#e5e7eb;
+    }
+    .thirdrow.in {
+      background:linear-gradient(135deg, rgba(56,189,248,.22), rgba(37,99,235,.16));
+      border-color:rgba(56,189,248,.32);
+      color:white;
+      font-weight:900;
+    }
+    .round-title {
+      background:linear-gradient(135deg,#fbbf24,#f97316);
+      color:#111827;
+      border-radius:18px;
+      padding:11px;
+      text-align:center;
+      font-weight:1000;
+      margin-bottom:12px;
+      box-shadow:0 6px 18px rgba(251,191,36,.18);
+    }
+    .kogame {
+      border:2px solid rgba(255,255,255,.28);
+      border-radius:20px;
+      background:rgba(8,15,40,.22);
+      padding:13px;
+      margin-bottom:12px;
+      transition:.15s ease;
+    }
+    .kogame:hover { background:rgba(8,15,40,.32); transform:translateY(-1px); }
+    .small { color:#7dd3fc; font-size:12px; font-weight:900; margin-bottom:8px; }
+    .teamline { display:grid; grid-template-columns: 1fr 48px; gap:8px; align-items:center; margin-bottom:8px; }
+    .badge {
+      display:inline-flex;
+      align-items:center;
+      background:rgba(255,255,255,.07);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:999px;
+      padding:8px 10px;
+      min-height:34px;
+      font-size:13px;
+      color:white;
+    }
+    .winner {
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.22);
+      color:#bbf7d0;
+      border-radius:15px;
+      padding:10px;
+      margin-top:10px;
+      font-size:13px;
+    }
+    .scroll { max-height:720px; overflow:auto; padding-left:5px; }
+    .champ { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .champ strong { background:linear-gradient(135deg,#fbbf24,#f97316); color:#111827; border-radius:18px; padding:12px 18px; font-size:18px; }
+    .scorebox { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; margin-top:16px; }
+    .scoreitem {
+      background:rgba(8,15,40,.24);
+      border:2px solid rgba(255,255,255,.28);
+      border-radius:20px;
+      padding:15px;
+      text-align:center;
+      color:#cbd5e1;
+    }
+    .scoreitem b { display:block; font-size:28px; margin-top:4px; color:#fbbf24; }
+    footer { text-align:center; color:#94a3b8; padding:30px 0 10px; font-size:14px; }
+    footer b { color:#fbbf24; }
+    @media (max-width: 1100px) {
+      .two, .groups-grid, .tables-grid { grid-template-columns:1fr; }
+      .ko-grid { grid-template-columns: repeat(2,minmax(230px,1fr)); }
+      h1 { font-size:32px; }
+      .wrap, .container { padding:16px; }
+    }
+  
+    .groupbox:hover,
+    .kogame:hover,
+    .match:hover {
+      border-color: rgba(125,211,252,.55);
+      box-shadow: 0 0 0 1px rgba(125,211,252,.18), 0 8px 22px rgba(0,0,0,.18);
+    }
+
+    input:hover {
+      border-color: rgba(255,255,255,.45);
+    }
+
+    input:focus {
+      border-color:#7dd3fc !important;
+      box-shadow:0 0 0 4px rgba(125,211,252,.22);
+      background:#08213f;
+    }
+
+    .match {
+      position:relative;
+    }
+
+    .match:before {
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:18px;
+      pointer-events:none;
+      border:1px solid rgba(255,255,255,.05);
+    }
+
+    .groupbox h3,
+    .round-title {
+      letter-spacing:.4px;
+    }
+
+
+    .tiebox {
+      margin-top:12px;
+      padding:12px;
+      border-radius:16px;
+      border:2px dashed rgba(251,191,36,.65);
+      background:rgba(251,191,36,.12);
+      color:#fde68a;
+      font-size:13px;
+    }
+    .tiebox h4 { margin:0 0 8px; color:#fbbf24; font-size:14px; }
+    .tiepair {
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:8px;
+      align-items:center;
+      margin-top:8px;
+    }
+    .tiepair select {
+      width:100%;
+      border:2px solid rgba(251,191,36,.55);
+      border-radius:12px;
+      padding:8px;
+      background:#0b1e3a;
+      color:white;
+      font-weight:800;
+    }
+  </style>
+
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <div style="color:#64748b;font-weight:800">🏆 מונדיאל 2026 — 🏆 World Cup 2026 Predictor</div>
+      <h1>מזינים הימורים ותוצאות בפועל — ומקבלים ניקוד, טבלאות ובראקט מלא</h1>
+      <p>קובץ HTML יחיד. שומרים במחשב, פותחים בדפדפן, ומשחקים עם תרחישים לפי הבתים, לוח המשחקים ושכבת ההימורים האישית. בלי התקנות ובלי להקריב קורבן לאלוהי האקסל.</p>
+    </div>
+    <div class="buttons">
+      <button class="primary" onclick="saveData()">שמירה בדפדפן</button>
+      <button onclick="resetActualScores()">איפוס תוצאות בפועל</button>
+      <button onclick="resetPredictions()">איפוס הימורים</button>
+      <button onclick="resetTieBreakers()">איפוס Manual Tie-Breakers</button>
+      <button onclick="resetAll()">איפוס מלא</button>
+      <button onclick="toggleEdit()">עריכת שמות נבחרות</button>
+      <button onclick="exportData()">ייצוא גיבוי</button>
+      <button onclick="document.getElementById('importFile').click()">ייבוא גיבוי</button>
+      <input id="importFile" type="file" accept="application/json" style="display:none" onchange="importData(event)" />
+    </div>
+    <div class="note"><b>הוראות הפעלה:</b> הבתים והמועדים כבר מוזנים. מזינים שערים בתאים הלבנים. בנוקאאוט, אם המשחק נגמר תיקו, לוחצים A בפנדלים או B בפנדלים. כל היתר מתעדכן לבד. שוברי שוויון עמוקים מאוד וטבלת Annex C הרשמית של פיפ״א מטופלים כאן באופן פרקטי, לא משפטי־רשמי.</div>
+  </section>
+
+  <section class="card">
+    <h2>טבלת ההימורים שלך</h2>
+    <p>ניקוד: 3 נק׳ לתוצאה מדויקת, 1 נק׳ לכיוון נכון — ניצחון/תיקו/הפסד. החישוב נעשה רק למשחקים שיש בהם גם הימור וגם תוצאה בפועל.</p>
+    <div class="scorebox">
+      <div class="scoreitem"><span>ניקוד</span><b id="betPoints">0</b></div>
+      <div class="scoreitem"><span>בול פגיעה</span><b id="betExact">0</b></div>
+      <div class="scoreitem"><span>כיוון נכון</span><b id="betOutcome">0</b></div>
+      <div class="scoreitem"><span>משחקים שנבדקו</span><b id="betChecked">0</b></div>
+    </div>
+  </section>
+
+  <section class="grid two">
+    <div class="grid">
+      <section class="card">
+        <h2>בתי הטורניר</h2>
+        <div id="groups" class="grid groups-grid"></div>
+      </section>
+      <section class="card">
+        <h2>משחקי בתים — 72 משחקים</h2>
+        <div id="groupMatches" class="scroll"></div>
+      </section>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>טבלאות בתים</h2>
+        <div id="tables" class="grid tables-grid"></div>
+      </section>
+      <section class="card">
+        <h2>דירוג מקומות שלישיים</h2>
+        <div id="thirds"></div>
+      </section>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>בראקט נוקאאוט מלא</h2>
+    <div id="knockout" class="grid ko-grid"></div>
+  </section>
+</div>
+
+<script>
+const GROUPS = "ABCDEFGHIJKL".split("");
+
+const GROUP_SCHEDULE = {
+  "A-1": {date:"11.6", time:"22:00 ישראל", venue:"Mexico City Stadium, Mexico City"},
+  "A-2": {date:"12.6", time:"05:00 ישראל", venue:"Estadio Guadalajara, Zapopan"},
+  "A-3": {date:"19.6", time:"04:00 ישראל", venue:"Estadio Guadalajara, Zapopan"},
+  "A-4": {date:"18.6", time:"19:00 ישראל", venue:"Atlanta Stadium, Atlanta"},
+  "A-5": {date:"25.6", time:"04:00 ישראל", venue:"Mexico City Stadium, Mexico City"},
+  "A-6": {date:"25.6", time:"04:00 ישראל", venue:"Estadio Monterrey, Guadalupe"},
+
+  "B-1": {date:"12.6", time:"22:00 ישראל", venue:"Toronto Stadium, Toronto"},
+  "B-2": {date:"13.6", time:"22:00 ישראל", venue:"San Francisco Bay Area Stadium"},
+  "B-3": {date:"19.6", time:"01:00 ישראל", venue:"BC Place, Vancouver"},
+  "B-4": {date:"18.6", time:"22:00 ישראל", venue:"Los Angeles Stadium, Los Angeles"},
+  "B-5": {date:"24.6", time:"22:00 ישראל", venue:"BC Place, Vancouver"},
+  "B-6": {date:"24.6", time:"22:00 ישראל", venue:"Seattle Stadium, Seattle"},
+
+  "C-1": {date:"14.6", time:"01:00 ישראל", venue:"New York New Jersey Stadium"},
+  "C-2": {date:"14.6", time:"04:00 ישראל", venue:"Boston Stadium, Boston"},
+  "C-3": {date:"20.6", time:"03:30 ישראל", venue:"Philadelphia Stadium, Philadelphia"},
+  "C-4": {date:"20.6", time:"01:00 ישראל", venue:"Boston Stadium, Boston"},
+  "C-5": {date:"25.6", time:"01:00 ישראל", venue:"Miami Stadium, Miami"},
+  "C-6": {date:"25.6", time:"01:00 ישראל", venue:"Atlanta Stadium, Atlanta"},
+
+  "D-1": {date:"13.6", time:"04:00 ישראל", venue:"Los Angeles Stadium, Los Angeles"},
+  "D-2": {date:"14.6", time:"07:00 ישראל", venue:"BC Place, Vancouver"},
+  "D-3": {date:"19.6", time:"22:00 ישראל", venue:"Seattle Stadium, Seattle"},
+  "D-4": {date:"20.6", time:"06:00 ישראל", venue:"San Francisco Bay Area Stadium"},
+  "D-5": {date:"26.6", time:"05:00 ישראל", venue:"Los Angeles Stadium, Los Angeles"},
+  "D-6": {date:"26.6", time:"05:00 ישראל", venue:"San Francisco Bay Area Stadium"},
+
+  "E-1": {date:"14.6", time:"20:00 ישראל", venue:"Houston Stadium, Houston"},
+  "E-2": {date:"15.6", time:"02:00 ישראל", venue:"Philadelphia Stadium, Philadelphia"},
+  "E-3": {date:"20.6", time:"23:00 ישראל", venue:"Toronto Stadium, Toronto"},
+  "E-4": {date:"21.6", time:"06:00 ישראל", venue:"Kansas City Stadium, Kansas City"},
+  "E-5": {date:"25.6", time:"23:00 ישראל", venue:"New York New Jersey Stadium"},
+  "E-6": {date:"25.6", time:"23:00 ישראל", venue:"Philadelphia Stadium, Philadelphia"},
+
+  "F-1": {date:"14.6", time:"23:00 ישראל", venue:"Dallas Stadium, Dallas"},
+  "F-2": {date:"15.6", time:"05:00 ישראל", venue:"Estadio Monterrey, Guadalupe"},
+  "F-3": {date:"20.6", time:"20:00 ישראל", venue:"Houston Stadium, Houston"},
+  "F-4": {date:"21.6", time:"07:00 ישראל", venue:"Estadio Monterrey, Guadalupe"},
+  "F-5": {date:"26.6", time:"02:00 ישראל", venue:"Dallas Stadium, Dallas"},
+  "F-6": {date:"26.6", time:"02:00 ישראל", venue:"Kansas City Stadium, Kansas City"},
+
+  "G-1": {date:"15.6", time:"22:00 ישראל", venue:"BC Place, Vancouver"},
+  "G-2": {date:"16.6", time:"04:00 ישראל", venue:"Los Angeles Stadium, Los Angeles"},
+  "G-3": {date:"21.6", time:"22:00 ישראל", venue:"Los Angeles Stadium, Los Angeles"},
+  "G-4": {date:"22.6", time:"04:00 ישראל", venue:"BC Place, Vancouver"},
+  "G-5": {date:"27.6", time:"06:00 ישראל", venue:"Seattle Stadium, Seattle"},
+  "G-6": {date:"27.6", time:"06:00 ישראל", venue:"BC Place, Vancouver"},
+
+  "H-1": {date:"15.6", time:"19:00 ישראל", venue:"Atlanta Stadium, Atlanta"},
+  "H-2": {date:"16.6", time:"01:00 ישראל", venue:"Miami Stadium, Miami"},
+  "H-3": {date:"21.6", time:"19:00 ישראל", venue:"Atlanta Stadium, Atlanta"},
+  "H-4": {date:"22.6", time:"01:00 ישראל", venue:"Miami Stadium, Miami"},
+  "H-5": {date:"27.6", time:"03:00 ישראל", venue:"Houston Stadium, Houston"},
+  "H-6": {date:"27.6", time:"03:00 ישראל", venue:"Estadio Guadalajara, Zapopan"},
+
+  "I-1": {date:"16.6", time:"22:00 ישראל", venue:"New York New Jersey Stadium"},
+  "I-2": {date:"17.6", time:"01:00 ישראל", venue:"Boston Stadium, Boston"},
+  "I-3": {date:"23.6", time:"00:00 ישראל", venue:"Philadelphia Stadium, Philadelphia"},
+  "I-4": {date:"23.6", time:"03:00 ישראל", venue:"New York New Jersey Stadium"},
+  "I-5": {date:"26.6", time:"22:00 ישראל", venue:"Boston Stadium, Boston"},
+  "I-6": {date:"26.6", time:"22:00 ישראל", venue:"Toronto Stadium, Toronto"},
+
+  "J-1": {date:"17.6", time:"04:00 ישראל", venue:"Kansas City Stadium, Kansas City"},
+  "J-2": {date:"17.6", time:"07:00 ישראל", venue:"San Francisco Bay Area Stadium"},
+  "J-3": {date:"22.6", time:"20:00 ישראל", venue:"Dallas Stadium, Dallas"},
+  "J-4": {date:"23.6", time:"06:00 ישראל", venue:"San Francisco Bay Area Stadium"},
+  "J-5": {date:"28.6", time:"05:00 ישראל", venue:"Kansas City Stadium, Kansas City"},
+  "J-6": {date:"28.6", time:"05:00 ישראל", venue:"Dallas Stadium, Dallas"},
+
+  "K-1": {date:"17.6", time:"20:00 ישראל", venue:"Houston Stadium, Houston"},
+  "K-2": {date:"18.6", time:"05:00 ישראל", venue:"Mexico City Stadium, Mexico City"},
+  "K-3": {date:"23.6", time:"20:00 ישראל", venue:"Houston Stadium, Houston"},
+  "K-4": {date:"24.6", time:"05:00 ישראל", venue:"Estadio Guadalajara, Zapopan"},
+  "K-5": {date:"28.6", time:"02:30 ישראל", venue:"Miami Stadium, Miami"},
+  "K-6": {date:"28.6", time:"02:30 ישראל", venue:"Atlanta Stadium, Atlanta"},
+
+  "L-1": {date:"17.6", time:"23:00 ישראל", venue:"Dallas Stadium, Dallas"},
+  "L-2": {date:"18.6", time:"02:00 ישראל", venue:"Toronto Stadium, Toronto"},
+  "L-3": {date:"23.6", time:"23:00 ישראל", venue:"Boston Stadium, Boston"},
+  "L-4": {date:"24.6", time:"02:00 ישראל", venue:"Toronto Stadium, Toronto"},
+  "L-5": {date:"28.6", time:"00:00 ישראל", venue:"New York New Jersey Stadium"},
+  "L-6": {date:"28.6", time:"00:00 ישראל", venue:"Philadelphia Stadium, Philadelphia"}
+};
+
+const KO_SCHEDULE = {
+  73:{date:"28.6", time:"22:00 ישראל", venue:"Los Angeles Stadium, Los Angeles"},
+  74:{date:"29.6", time:"22:00 ישראל", venue:"Houston Stadium, Houston"},
+  75:{date:"29.6", time:"23:30 ישראל", venue:"Boston Stadium, Boston"},
+  76:{date:"30.6", time:"04:00 ישראל", venue:"Estadio Monterrey, Guadalupe"},
+  77:{date:"30.6", time:"20:00 ישראל", venue:"Dallas Stadium, Dallas"},
+  78:{date:"1.7", time:"00:00 ישראל", venue:"New York New Jersey Stadium"},
+  79:{date:"1.7", time:"04:00 ישראל", venue:"Mexico City Stadium, Mexico City"},
+  80:{date:"1.7", time:"19:00 ישראל", venue:"Atlanta Stadium, Atlanta"},
+  81:{date:"1.7", time:"23:00 ישראל", venue:"Seattle Stadium, Seattle"},
+  82:{date:"1.7", time:"23:00 ישראל", venue:"San Francisco Bay Area Stadium"},
+  83:{date:"2.7", time:"22:00 ישראל", venue:"Los Angeles Stadium, Los Angeles"},
+  84:{date:"3.7", time:"02:00 ישראל", venue:"Toronto Stadium, Toronto"},
+  85:{date:"3.7", time:"06:00 ישראל", venue:"BC Place, Vancouver"},
+  86:{date:"3.7", time:"21:00 ישראל", venue:"Dallas Stadium, Dallas"},
+  87:{date:"4.7", time:"01:00 ישראל", venue:"Miami Stadium, Miami"},
+  88:{date:"4.7", time:"04:30 ישראל", venue:"Kansas City Stadium, Kansas City"},
+  89:{date:"4.7", time:"20:00 ישראל", venue:"Houston Stadium, Houston"},
+  90:{date:"5.7", time:"00:00 ישראל", venue:"Philadelphia Stadium, Philadelphia"},
+  91:{date:"5.7", time:"23:00 ישראל", venue:"New York New Jersey Stadium"},
+  92:{date:"6.7", time:"03:00 ישראל", venue:"Mexico City Stadium, Mexico City"},
+  93:{date:"6.7", time:"22:00 ישראל", venue:"Dallas Stadium, Dallas"},
+  94:{date:"7.7", time:"03:00 ישראל", venue:"Seattle Stadium, Seattle"},
+  95:{date:"7.7", time:"19:00 ישראל", venue:"Atlanta Stadium, Atlanta"},
+  96:{date:"7.7", time:"23:00 ישראל", venue:"BC Place, Vancouver"},
+  97:{date:"9.7", time:"23:00 ישראל", venue:"Boston Stadium, Boston"},
+  98:{date:"10.7", time:"22:00 ישראל", venue:"Los Angeles Stadium, Los Angeles"},
+  99:{date:"11.7", time:"23:00 ישראל", venue:"Miami Stadium, Miami"},
+  100:{date:"12.7", time:"04:00 ישראל", venue:"Kansas City Stadium, Kansas City"},
+  101:{date:"14.7", time:"22:00 ישראל", venue:"Dallas Stadium, Dallas"},
+  102:{date:"15.7", time:"22:00 ישראל", venue:"Atlanta Stadium, Atlanta"},
+  103:{date:"19.7", time:"00:00 ישראל", venue:"Miami Stadium, Miami"},
+  104:{date:"19.7", time:"22:00 ישראל", venue:"New York New Jersey Stadium"}
+};
+
+const PAIRS = [[0,1],[2,3],[0,2],[3,1],[3,0],[1,2]];
+const STORAGE_KEY = "wc2026-html-sim-v6-manual-tiebreaker";
+let editTeams = true;
+
+const defaultGroups = {
+  A: ["מקסיקו", "דרום אפריקה", "דרום קוריאה", "צ'כיה"],
+  B: ["קנדה", "בוסניה והרצגובינה", "קטאר", "שווייץ"],
+  C: ["ברזיל", "מרוקו", "האיטי", "סקוטלנד"],
+  D: ["ארה״ב", "פרגוואי", "אוסטרליה", "טורקיה"],
+  E: ["גרמניה", "קוראסאו", "חוף השנהב", "אקוואדור"],
+  F: ["הולנד", "יפן", "שוודיה", "תוניסיה"],
+  G: ["בלגיה", "מצרים", "איראן", "ניו זילנד"],
+  H: ["ספרד", "כף ורדה", "ערב הסעודית", "אורוגוואי"],
+  I: ["צרפת", "סנגל", "עיראק", "נורווגיה"],
+  J: ["ארגנטינה", "אלג'יריה", "אוסטריה", "ירדן"],
+  K: ["פורטוגל", "הרפובליקה הדמוקרטית של קונגו", "אוזבקיסטן", "קולומביה"],
+  L: ["אנגליה", "קרואטיה", "גאנה", "פנמה"]
+};
+
+const r32Templates = [
+  { id:73, round:"1/16", a:"2A", b:"2B" },
+  { id:74, round:"1/16", a:"1C", b:"2F" },
+  { id:75, round:"1/16", a:"1E", b:"3:A/B/C/D/F" },
+  { id:76, round:"1/16", a:"1F", b:"2C" },
+  { id:77, round:"1/16", a:"2E", b:"2I" },
+  { id:78, round:"1/16", a:"1I", b:"3:C/D/F/G/H" },
+  { id:79, round:"1/16", a:"1A", b:"3:C/E/F/H/I" },
+  { id:80, round:"1/16", a:"1L", b:"3:E/H/I/J/K" },
+  { id:81, round:"1/16", a:"1G", b:"3:A/E/H/I/J" },
+  { id:82, round:"1/16", a:"1D", b:"3:B/E/F/I/J" },
+  { id:83, round:"1/16", a:"1H", b:"2J" },
+  { id:84, round:"1/16", a:"2K", b:"2L" },
+  { id:85, round:"1/16", a:"1B", b:"3:E/F/G/I/J" },
+  { id:86, round:"1/16", a:"1J", b:"2H" },
+  { id:87, round:"1/16", a:"2D", b:"2G" },
+  { id:88, round:"1/16", a:"1K", b:"3:D/E/I/J/L" },
+];
+const nextRounds = [
+  { round:"שמינית", games:[[89,74,77],[90,73,75],[91,76,78],[92,79,80],[93,83,84],[94,81,82],[95,86,88],[96,85,87]] },
+  { round:"רבע", games:[[97,89,90],[98,93,94],[99,91,92],[100,95,96]] },
+  { round:"חצי", games:[[101,97,98],[102,99,100]] },
+  { round:"מקום שלישי", games:[[103,"L101","L102"]] },
+  { round:"גמר", games:[[104,101,102]] },
+];
+
+let state = {
+  groups: JSON.parse(JSON.stringify(defaultGroups)),
+  groupMatches: [],
+  knockout: [],
+  tieBreakers: {}
+};
+
+function buildGroupMatches(groups){
+  const arr = [];
+  for (const g of GROUPS) {
+    PAIRS.forEach((p,i)=> arr.push({id:`${g}-${i+1}`, group:g, teamA:groups[g][p[0]], teamB:groups[g][p[1]], goalsA:"", goalsB:"", predA:"", predB:"", schedule: GROUP_SCHEDULE[`${g}-${i+1}`]}));
+  }
+  return arr;
+}
+function emptyKnockout(){
+  return [
+    ...r32Templates.map(m => ({...m, goalsA:"", goalsB:"", predA:"", predB:"", pen:"", schedule: KO_SCHEDULE[m.id]})),
+    ...nextRounds.flatMap(r => r.games.map(([id,a,b]) => ({id, round:r.round, a,b, goalsA:"", goalsB:"", predA:"", predB:"", pen:"", schedule: KO_SCHEDULE[id]})))
+  ];
+}
+state.groupMatches = buildGroupMatches(state.groups);
+state.knockout = emptyKnockout();
+
+function complete(m){ return m && m.goalsA !== "" && m.goalsB !== "" && !isNaN(Number(m.goalsA)) && !isNaN(Number(m.goalsB)); }
+function winnerOf(m){
+  if(!complete(m)) return "TBD";
+  const a=Number(m.goalsA), b=Number(m.goalsB);
+  if(a>b) return m.teamA || "TBD";
+  if(b>a) return m.teamB || "TBD";
+  if(m.pen==="A") return m.teamA || "TBD";
+  if(m.pen==="B") return m.teamB || "TBD";
+  return "בחר מנצחת בפנדלים";
+}
+function loserOf(m){
+  if(!complete(m)) return "TBD";
+  const a=Number(m.goalsA), b=Number(m.goalsB);
+  if(a>b) return m.teamB || "TBD";
+  if(b>a) return m.teamA || "TBD";
+  if(m.pen==="A") return m.teamB || "TBD";
+  if(m.pen==="B") return m.teamA || "TBD";
+  return "בחר מנצחת בפנדלים";
+}
+function rowKey(group, team){
+  return `${group}::${team}`;
+}
+function manualTieRank(group, team){
+  return Number(state.tieBreakers?.[rowKey(group, team)] || 999);
+}
+function basicCompare(a,b,group){
+  return b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || manualTieRank(group,a.team)-manualTieRank(group,b.team) || a.idx-b.idx;
+}
+function computeTables(){
+  const tables = {};
+  for (const g of GROUPS) {
+    const rows = state.groups[g].map((team,idx)=>({team,idx,p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}));
+    state.groupMatches.filter(m => m.group===g && complete(m)).forEach(m=>{
+      const A = rows.find(r=>r.team===m.teamA), B = rows.find(r=>r.team===m.teamB);
+      if(!A || !B) return;
+      const ga=Number(m.goalsA), gb=Number(m.goalsB);
+      A.p++; B.p++; A.gf+=ga; A.ga+=gb; B.gf+=gb; B.ga+=ga;
+      if(ga>gb){A.w++; B.l++; A.pts+=3;} else if(gb>ga){B.w++; A.l++; B.pts+=3;} else {A.d++; B.d++; A.pts++; B.pts++;}
+    });
+    rows.forEach(r=>r.gd=r.gf-r.ga);
+    rows.sort((a,b)=> basicCompare(a,b,g));
+    tables[g] = rows;
+  }
+  return tables;
+}
+function tiedClusters(rows){
+  const clusters = [];
+  const bucket = {};
+  rows.forEach(r => {
+    const key = `${r.pts}|${r.gd}|${r.gf}`;
+    if(!bucket[key]) bucket[key] = [];
+    bucket[key].push(r);
+  });
+  Object.values(bucket).forEach(items => {
+    if(items.length > 1) clusters.push(items);
+  });
+  return clusters;
+}
+function setManualTie(group, team, rank){
+  if(!state.tieBreakers) state.tieBreakers = {};
+  const value = String(rank);
+  if(value === "999") {
+    delete state.tieBreakers[rowKey(group, team)];
+  } else {
+    const tablesNow = computeTables();
+    const cluster = tiedClusters(tablesNow[group]).find(c => c.some(r => r.team === team)) || [];
+    cluster.forEach(r => {
+      if(r.team !== team && state.tieBreakers[rowKey(group, r.team)] === value) {
+        delete state.tieBreakers[rowKey(group, r.team)];
+      }
+    });
+    state.tieBreakers[rowKey(group, team)] = value;
+  }
+  render();
+}
+function resetTieBreakers(){
+  state.tieBreakers = {};
+  render();
+}
+function thirds(tables){
+  return GROUPS.map(g => ({group:g, ...tables[g][2]}))
+    .sort((a,b)=> b.pts-a.pts || b.gd-a.gd || b.gf-a.gf || a.group.localeCompare(b.group))
+    .map((t,i)=>({...t, rank:i+1, qualified:i<8}));
+}
+function resolveSlot(slot, tables, thirdPool){
+  if(typeof slot === "number" || String(slot).startsWith("L")) return null;
+  if(String(slot).includes(":")){
+    const allowed = slot.split(":")[1].split("/");
+    const cand = thirdPool.find(t => t.qualified && allowed.includes(t.group) && !t.used);
+    if(cand){ cand.used = true; return `${cand.team} — מקום 3 בית ${cand.group}`; }
+    return `מקום 3: ${allowed.join("/")}`;
+  }
+  const pos = Number(slot[0])-1, g = slot[1];
+  return tables[g]?.[pos]?.team || slot;
+}
+function seededKnockout(tables, thirdList){
+  const byId = {};
+  const thirdPool = thirdList.map(t=>({...t, used:false}));
+  for (const m of state.knockout) {
+    let teamA, teamB;
+    if(typeof m.a === "number") teamA = winnerOf(byId[m.a]);
+    else if(String(m.a).startsWith("L")) teamA = loserOf(byId[Number(String(m.a).slice(1))]);
+    else teamA = resolveSlot(m.a, tables, thirdPool);
+
+    if(typeof m.b === "number") teamB = winnerOf(byId[m.b]);
+    else if(String(m.b).startsWith("L")) teamB = loserOf(byId[Number(String(m.b).slice(1))]);
+    else teamB = resolveSlot(m.b, tables, thirdPool);
+
+    byId[m.id] = {...m, teamA, teamB};
+  }
+  return Object.values(byId);
+}
+
+function formatSchedule(s){
+  if(!s) return "";
+  return `📅 ${s.date} | 🕒 ${s.time} | 📍 ${s.venue}`;
+}
+
+
+function outcome(a,b){
+  a = Number(a); b = Number(b);
+  if(a > b) return "A";
+  if(b > a) return "B";
+  return "D";
+}
+function hasPrediction(m){
+  return m && m.predA !== "" && m.predB !== "" && !isNaN(Number(m.predA)) && !isNaN(Number(m.predB));
+}
+function predictionScoreFor(m){
+  if(!complete(m) || !hasPrediction(m)) return null;
+  const exact = Number(m.predA) === Number(m.goalsA) && Number(m.predB) === Number(m.goalsB);
+  const sameOutcome = outcome(m.predA, m.predB) === outcome(m.goalsA, m.goalsB);
+  return { exact, sameOutcome, points: exact ? 3 : sameOutcome ? 1 : 0 };
+}
+function predictionSummary(koList){
+  const all = [...state.groupMatches, ...koList];
+  let checked = 0, exact = 0, outcomeOnly = 0, points = 0;
+  all.forEach(m => {
+    const s = predictionScoreFor(m);
+    if(!s) return;
+    checked++;
+    points += s.points;
+    if(s.exact) exact++;
+    else if(s.sameOutcome) outcomeOnly++;
+  });
+  return {checked, exact, outcomeOnly, points};
+}
+
+function render(){
+  const tables = computeTables();
+  const thirdList = thirds(tables);
+  const ko = seededKnockout(tables, thirdList);
+  const betSum = predictionSummary(ko);
+  document.getElementById("betPoints").textContent = betSum.points;
+  document.getElementById("betExact").textContent = betSum.exact;
+  document.getElementById("betOutcome").textContent = betSum.outcomeOnly;
+  document.getElementById("betChecked").textContent = betSum.checked;
+
+  document.getElementById("groups").innerHTML = GROUPS.map(g => `
+    <div class="groupbox"><h3>בית ${g}</h3>
+      ${state.groups[g].map((t,i)=> editTeams
+        ? `<input class="team-edit" value="${escapeHtml(t)}" oninput="updateTeam('${g}',${i},this.value)" />`
+        : `<div class="badge team-edit">${escapeHtml(t)}</div>`).join("")}
+    </div>`).join("");
+
+  document.getElementById("groupMatches").innerHTML = state.groupMatches.map(m => `
+    <div class="match">
+      <div class="g">${m.group}</div>
+      <div class="a">${escapeHtml(m.teamA)}</div>
+      <input class="score" type="number" min="0" value="${m.goalsA}" oninput="updateGM('${m.id}','goalsA',this.value)" />
+      <input class="score" type="number" min="0" value="${m.goalsB}" oninput="updateGM('${m.id}','goalsB',this.value)" />
+      <div class="b">${escapeHtml(m.teamB)}</div>
+      <div></div><div class="meta" style="grid-column:2 / 6">${escapeHtml(formatSchedule(m.schedule))}</div>
+      <div class="betline">
+        <span class="labeltiny">הימור</span>
+        <input type="number" min="0" value="${m.predA || ''}" oninput="updateGM('${m.id}','predA',this.value)" />
+        <input type="number" min="0" value="${m.predB || ''}" oninput="updateGM('${m.id}','predB',this.value)" />
+        <span>ניקוד: ${predictionScoreFor(m)?.points ?? '-'}</span>
+      </div>
+    </div>`).join("");
+
+  document.getElementById("tables").innerHTML = GROUPS.map(g => {
+    const clusters = tiedClusters(tables[g]);
+    const tieHtml = clusters.length ? `
+      <div class="tiebox">
+        <h4>Manual Tie-Breaker</h4>
+        <div>יש שוויון אחרי נקודות, הפרש שערים ושערי זכות. בחר דירוג ידני לקבוצות השוות.</div>
+        ${clusters.map(cluster => `
+          <div style="margin-top:10px;font-weight:900">${cluster.map(r => escapeHtml(r.team)).join(" / ")}</div>
+          ${cluster.map(r => `
+            <div class="tiepair">
+              <span>${escapeHtml(r.team)}</span>
+              <select onchange="setManualTie('${g}', ${JSON.stringify(r.team)}, this.value)">
+                <option value="999" ${manualTieRank(g,r.team)===999 ? "selected" : ""}>לא נקבע</option>
+                ${cluster.map((_,idx) => `<option value="${idx+1}" ${manualTieRank(g,r.team)===idx+1 ? "selected" : ""}>מקום ${idx+1} בתוך השוויון</option>`).join("")}
+              </select>
+            </div>`).join("")}
+        `).join("")}
+      </div>` : "";
+    return `
+    <div class="groupbox"><h3>בית ${g}</h3>
+      <table><thead><tr><th>נבחרת</th><th>נק׳</th><th>הפ׳</th><th>ז׳</th></tr></thead><tbody>
+      ${tables[g].map((r,i)=>`<tr class="${i<2?'qual':i===2?'third':'out'}"><td>${i+1}. ${escapeHtml(r.team)}</td><td>${r.pts}</td><td>${r.gd}</td><td>${r.gf}</td></tr>`).join("")}
+      </tbody></table>
+      ${tieHtml}
+    </div>`;
+  }).join("");
+
+  document.getElementById("thirds").innerHTML = thirdList.map(t => `
+    <div class="thirdrow ${t.qualified?'in':''}">
+      <span>${t.rank}. ${escapeHtml(t.team)} <span style="color:#64748b">בית ${t.group}</span></span>
+      <b>${t.pts} נק׳ | ${t.gd} | ${t.gf} ז׳</b>
+    </div>`).join("");
+
+  const rounds = ["1/16","שמינית","רבע","חצי","מקום שלישי","גמר"];
+  document.getElementById("knockout").innerHTML = rounds.map(r => `
+    <div><div class="round-title">${r}</div>
+      ${ko.filter(m=>m.round===r).map(m=>`
+        <div class="kogame">
+          <div class="small">משחק ${m.id}</div>
+          <div class="meta">${escapeHtml(formatSchedule(m.schedule))}</div>
+          <div class="teamline"><span class="badge">${escapeHtml(m.teamA)}</span><input class="score" type="number" min="0" value="${m.goalsA}" oninput="updateKO(${m.id},'goalsA',this.value)" /></div>
+          <div class="teamline"><span class="badge">${escapeHtml(m.teamB)}</span><input class="score" type="number" min="0" value="${m.goalsB}" oninput="updateKO(${m.id},'goalsB',this.value)" /></div>
+          <div class="buttons" style="margin-top:6px">
+            <button class="${m.pen==='A'?'active':''}" onclick="setPen(${m.id},'A')">A בפנדלים</button>
+            <button class="${m.pen==='B'?'active':''}" onclick="setPen(${m.id},'B')">B בפנדלים</button>
+          </div>
+          <div class="betline" style="grid-template-columns: 70px 48px 48px 1fr; margin-top:8px">
+            <span class="labeltiny">הימור</span>
+            <input type="number" min="0" value="${m.predA || ''}" oninput="updateKO(${m.id},'predA',this.value)" />
+            <input type="number" min="0" value="${m.predB || ''}" oninput="updateKO(${m.id},'predB',this.value)" />
+            <span>ניקוד: ${predictionScoreFor(m)?.points ?? '-'}</span>
+          </div>
+          <div class="winner"><b>עולה:</b> ${escapeHtml(winnerOf(m))}</div>
+        </div>`).join("")}
+    </div>`).join("");
+}
+function updateTeam(g,i,v){
+  state.groups[g][i]=v || `${g}${i+1}`;
+  state.groupMatches = buildGroupMatches(state.groups);
+  render();
+}
+function updateGM(id,field,v){ const m=state.groupMatches.find(x=>x.id===id); if(m){m[field]=v;} render(); }
+function updateKO(id,field,v){ const m=state.knockout.find(x=>x.id===id); if(m){m[field]=v;} render(); }
+function setPen(id,side){ const m=state.knockout.find(x=>x.id===id); if(m){m.pen = m.pen===side ? "" : side;} render(); }
+function toggleEdit(){ editTeams = !editTeams; render(); }
+function resetActualScores(){
+  state.groupMatches.forEach(m => { m.goalsA=""; m.goalsB=""; });
+  state.knockout.forEach(m => { m.goalsA=""; m.goalsB=""; m.pen=""; });
+  render();
+}
+function resetPredictions(){
+  state.groupMatches.forEach(m => { m.predA=""; m.predB=""; });
+  state.knockout.forEach(m => { m.predA=""; m.predB=""; });
+  render();
+}
+function resetScores(){ resetActualScores(); }
+function resetAll(){ localStorage.removeItem(STORAGE_KEY); state.groups = JSON.parse(JSON.stringify(defaultGroups)); state.groupMatches = buildGroupMatches(state.groups); state.knockout = emptyKnockout(); state.tieBreakers = {}; editTeams=true; render(); }
+function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); alert("נשמר בדפדפן הזה."); }
+function exportData(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "wc2026-simulator-backup.json"; a.click(); URL.revokeObjectURL(a.href);
+}
+function importData(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=()=>{ try{ const s=JSON.parse(reader.result); if(s.groups&&s.groupMatches&&s.knockout){ state=s; if(!state.tieBreakers) state.tieBreakers={}; render(); saveData(); } else alert("קובץ גיבוי לא תקין"); }catch{ alert("לא הצלחתי לקרוא את הקובץ"); } };
+  reader.readAsText(file);
+}
+function escapeHtml(x){ return String(x ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+
+try {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(saved) {
+  state = JSON.parse(saved);
+  if(!state.tieBreakers) state.tieBreakers = {};
+}
+} catch {}
+render();
+</script>
+</body>
+</html>
